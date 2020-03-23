@@ -138,6 +138,7 @@ public class FootstepPlanningModule implements CloseableAndDisposable
       // Update planar regions
       boolean flatGroundMode = request.getAssumeFlatGround() || request.getPlanarRegionsList() == null || request.getPlanarRegionsList().isEmpty();
       PlanarRegionsList planarRegionsList = flatGroundMode ? null : request.getPlanarRegionsList();
+
       bodyPathPlanner.setPlanarRegionsList(planarRegionsList);
 
       if (request.getPlanBodyPath() && !flatGroundMode)

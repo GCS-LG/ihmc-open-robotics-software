@@ -131,7 +131,7 @@ public class AStarFootstepPlanner
       {
          goalNodes = createGoalNodes(request.getGoalFootPoses()::get);
       }
-
+      
       // Setup footstep planner
       FootstepNode startNode = createStartNode(request);
       goalMidFootPose.interpolate(request.getGoalFootPoses().get(RobotSide.LEFT), request.getGoalFootPoses().get(RobotSide.RIGHT), 0.5);
