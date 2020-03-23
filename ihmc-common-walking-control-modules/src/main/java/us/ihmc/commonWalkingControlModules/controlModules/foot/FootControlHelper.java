@@ -79,9 +79,10 @@ public class FootControlHelper
 
       if (walkingControllerParameters.enableLegSingularityAndKneeCollapseAvoidanceModule())
       {
-         legSingularityAndKneeCollapseAvoidanceControlModule = new LegSingularityAndKneeCollapseAvoidanceControlModule(namePrefix, contactableFoot, robotSide,
-                                                                                                                       walkingControllerParameters,
-                                                                                                                       controllerToolbox, registry);
+//         legSingularityAndKneeCollapseAvoidanceControlModule = new LegSingularityAndKneeCollapseAvoidanceControlModule(namePrefix, contactableFoot, robotSide,
+//                                                                                                                       walkingControllerParameters,
+//                                                                                                                       controllerToolbox, registry);
+         legSingularityAndKneeCollapseAvoidanceControlModule = null;
          workspaceLimiterControlModule = new WorkspaceLimiterControlModule(namePrefix, contactableFoot, robotSide, walkingControllerParameters, controllerToolbox, registry);
       }
       else
