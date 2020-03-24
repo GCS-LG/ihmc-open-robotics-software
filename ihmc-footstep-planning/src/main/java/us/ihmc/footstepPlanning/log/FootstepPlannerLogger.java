@@ -36,6 +36,7 @@ public class FootstepPlannerLogger
    static final String requestPacketFileName = "RequestPacket.json";
    static final String footstepParametersFileName = "FootstepParametersPacket.json";
    static final String bodyPathParametersFileName = "BodyPathParametersPacket.json";
+   static final String bodyPathPlanFileName = "BodyPathPlanMessage.json";
    static final String statusPacketFileName = "StatusPacket.json";
    static final String dataFileName = "PlannerIterationData.log";
 
@@ -57,6 +58,7 @@ public class FootstepPlannerLogger
    private final JSONSerializer<FootstepPlanningRequestPacket> requestPacketSerializer = new JSONSerializer<>(new FootstepPlanningRequestPacketPubSubType());
    private final JSONSerializer<FootstepPlannerParametersPacket> footstepParametersPacketSerializer = new JSONSerializer<>(new FootstepPlannerParametersPacketPubSubType());
    private final JSONSerializer<VisibilityGraphsParametersPacket> bodyPathParametersPacketSerializer = new JSONSerializer<>(new VisibilityGraphsParametersPacketPubSubType());
+   private final JSONSerializer<BodyPathPlanMessage> bodyPathPlanMessageSerializer = new JSONSerializer<>(new BodyPathPlanMessagePubSubType());
    private final JSONSerializer<FootstepPlanningToolboxOutputStatus> statusPacketSerializer = new JSONSerializer<>(new FootstepPlanningToolboxOutputStatusPubSubType());
 
    public FootstepPlannerLogger(FootstepPlanningModule planner)
@@ -140,6 +142,11 @@ public class FootstepPlannerLogger
          FootstepPlannerMessageTools.copyParametersToPacket(bodyPathParametersPacket, planner.getVisibilityGraphParameters());
          byte[] serializedBodyPathParameters = bodyPathParametersPacketSerializer.serializeToBytes(bodyPathParametersPacket);
          writeToFile(bodyPathParametersPacketFile, serializedBodyPathParameters);
+
+         // log body path plan message
+         String bodyPathPlanMessageFile = sessionDirectory + bodyPathPlanFileName;
+         byte[] serializedBodyPathPlanMessage = bodyPathPlanMessageSerializer.serializeToBytes(planner.getBodyPathPlanMessage());
+         writeToFile(bodyPathPlanMessageFile, serializedBodyPathPlanMessage);
 
          // log status packet
          String statusPacketFile = sessionDirectory + statusPacketFileName;

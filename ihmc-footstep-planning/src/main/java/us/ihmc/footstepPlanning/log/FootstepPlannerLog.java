@@ -1,9 +1,6 @@
 package us.ihmc.footstepPlanning.log;
 
-import controller_msgs.msg.dds.FootstepPlannerParametersPacket;
-import controller_msgs.msg.dds.FootstepPlanningRequestPacket;
-import controller_msgs.msg.dds.FootstepPlanningToolboxOutputStatus;
-import controller_msgs.msg.dds.VisibilityGraphsParametersPacket;
+import controller_msgs.msg.dds.*;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNode;
 import us.ihmc.pathPlanning.graph.structure.GraphEdge;
 
@@ -19,6 +16,7 @@ public class FootstepPlannerLog
    private final FootstepPlanningRequestPacket requestPacket = new FootstepPlanningRequestPacket();
    private final FootstepPlannerParametersPacket footstepParametersPacket = new FootstepPlannerParametersPacket();
    private final VisibilityGraphsParametersPacket bodyPathParametersPacket = new VisibilityGraphsParametersPacket();
+   private final BodyPathPlanMessage bodyPathPlanMessage = new BodyPathPlanMessage();
    private final FootstepPlanningToolboxOutputStatus statusPacket = new FootstepPlanningToolboxOutputStatus();
 
    private final Map<GraphEdge<FootstepNode>, FootstepPlannerEdgeData> edgeDataMap = new HashMap<>();
@@ -33,6 +31,7 @@ public class FootstepPlannerLog
    {
       return logName;
    }
+
    public FootstepPlanningRequestPacket getRequestPacket()
    {
       return requestPacket;
@@ -51,6 +50,11 @@ public class FootstepPlannerLog
    public FootstepPlanningToolboxOutputStatus getStatusPacket()
    {
       return statusPacket;
+   }
+
+   public BodyPathPlanMessage getBodyPathPlanMessage()
+   {
+      return bodyPathPlanMessage;
    }
 
    public Map<GraphEdge<FootstepNode>, FootstepPlannerEdgeData> getEdgeDataMap()
