@@ -326,7 +326,6 @@ public class PawPlanningController extends QuadrupedToolboxController
          result.getPathPlannerGoalPose().set(bodyPathPlan.getGoalPose());
       }
 
-      planarRegionsList.ifPresent(regions -> result.getPlanarRegionsList().set(PlanarRegionMessageConverter.convertToPlanarRegionsListMessage(regions)));
       result.setPlanId(planId.getIntegerValue());
       result.setFootstepPlanningResult(status.toByte());
       return result;

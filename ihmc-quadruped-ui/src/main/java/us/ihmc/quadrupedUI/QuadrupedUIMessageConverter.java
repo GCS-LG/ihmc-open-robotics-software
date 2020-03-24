@@ -150,8 +150,6 @@ public class QuadrupedUIMessageConverter
       // we want to listen to the resulting body path plan from the toolbox
       ROS2Tools.createCallbackSubscription(ros2Node, BodyPathPlanMessage.class, footstepPlannerPubGenerator,
                                            s -> processBodyPathPlanMessage(s.takeNextData()));
-      ROS2Tools.createCallbackSubscription(ros2Node, BodyPathPlanStatisticsMessage.class, footstepPlannerPubGenerator,
-                                           s -> processBodyPathPlanStatistics(s.takeNextData()));
       ROS2Tools.createCallbackSubscription(ros2Node, FootstepPlannerStatusMessage.class, footstepPlannerPubGenerator,
                                            s -> processFootstepPlannerStatus(s.takeNextData()));
       // we want to listen to the resulting footstep plan from the toolbox
@@ -299,21 +297,12 @@ public class QuadrupedUIMessageConverter
 
    private void processBodyPathPlanMessage(BodyPathPlanMessage packet)
    {
-      PlanarRegionsListMessage planarRegionsListMessage = packet.getPlanarRegionsList();
-      PlanarRegionsList planarRegionsList = PlanarRegionMessageConverter.convertToPlanarRegionsList(planarRegionsListMessage);
       PawStepPlanningResult result = PawStepPlanningResult.fromByte(packet.getFootstepPlanningResult());
       List<? extends Pose3DReadOnly> bodyPath = packet.getBodyPath();
 
-      messager.submitMessage(QuadrupedUIMessagerAPI.PlanarRegionDataTopic, planarRegionsList);
       messager.submitMessage(QuadrupedUIMessagerAPI.PlanningResultTopic, result);
       messager.submitMessage(QuadrupedUIMessagerAPI.BodyPathDataTopic, bodyPath);
 
-      if (verbose)
-         PrintTools.info("Received a body path planning result from the toolbox.");
-   }
-
-   private void processBodyPathPlanStatistics(BodyPathPlanStatisticsMessage packet)
-   {
       VisibilityMapHolder startVisibilityMap = VisibilityGraphMessagesConverter.convertToSingleSourceVisibilityMap(packet.getStartVisibilityMap());
       VisibilityMapHolder goalVisibilityMap = VisibilityGraphMessagesConverter.convertToSingleSourceVisibilityMap(packet.getGoalVisibilityMap());
       VisibilityMapHolder interRegionVisibilityMap = VisibilityGraphMessagesConverter.convertToInterRegionsVisibilityMap(packet.getInterRegionsMap());
@@ -326,6 +315,9 @@ public class QuadrupedUIMessageConverter
       messager.submitMessage(QuadrupedUIMessagerAPI.VisibilityMapWithNavigableRegionData, navigableRegionList);
       messager.submitMessage(QuadrupedUIMessagerAPI.InterRegionVisibilityMap, interRegionVisibilityMap);
       */
+
+      if (verbose)
+         PrintTools.info("Received a body path planning result from the toolbox.");
    }
 
    private void processFootstepPlannerStatus(FootstepPlannerStatusMessage packet)

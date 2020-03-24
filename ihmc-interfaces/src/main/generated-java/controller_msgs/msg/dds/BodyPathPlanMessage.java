@@ -24,17 +24,23 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
    public long sequence_id_;
    public byte footstep_planning_result_ = (byte) 255;
    public int plan_id_ = -1;
-   public controller_msgs.msg.dds.PlanarRegionsListMessage planar_regions_list_;
    public us.ihmc.idl.IDLSequence.Object<us.ihmc.euclid.geometry.Pose3D>  body_path_;
    public us.ihmc.euclid.geometry.Pose2D path_planner_start_pose_;
    public us.ihmc.euclid.geometry.Pose2D path_planner_goal_pose_;
+   public us.ihmc.idl.IDLSequence.Object<controller_msgs.msg.dds.VisibilityMapWithNavigableRegionMessage>  navigable_regions_;
+   public controller_msgs.msg.dds.VisibilityMapMessage inter_regions_map_;
+   public controller_msgs.msg.dds.VisibilityMapMessage start_visibility_map_;
+   public controller_msgs.msg.dds.VisibilityMapMessage goal_visibility_map_;
 
    public BodyPathPlanMessage()
    {
-      planar_regions_list_ = new controller_msgs.msg.dds.PlanarRegionsListMessage();
       body_path_ = new us.ihmc.idl.IDLSequence.Object<us.ihmc.euclid.geometry.Pose3D> (100, new geometry_msgs.msg.dds.PosePubSubType());
       path_planner_start_pose_ = new us.ihmc.euclid.geometry.Pose2D();
       path_planner_goal_pose_ = new us.ihmc.euclid.geometry.Pose2D();
+      navigable_regions_ = new us.ihmc.idl.IDLSequence.Object<controller_msgs.msg.dds.VisibilityMapWithNavigableRegionMessage> (25, new controller_msgs.msg.dds.VisibilityMapWithNavigableRegionMessagePubSubType());
+      inter_regions_map_ = new controller_msgs.msg.dds.VisibilityMapMessage();
+      start_visibility_map_ = new controller_msgs.msg.dds.VisibilityMapMessage();
+      goal_visibility_map_ = new controller_msgs.msg.dds.VisibilityMapMessage();
 
    }
 
@@ -52,10 +58,13 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
 
       plan_id_ = other.plan_id_;
 
-      controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType.staticCopy(other.planar_regions_list_, planar_regions_list_);
       body_path_.set(other.body_path_);
       geometry_msgs.msg.dds.Pose2DPubSubType.staticCopy(other.path_planner_start_pose_, path_planner_start_pose_);
       geometry_msgs.msg.dds.Pose2DPubSubType.staticCopy(other.path_planner_goal_pose_, path_planner_goal_pose_);
+      navigable_regions_.set(other.navigable_regions_);
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.staticCopy(other.inter_regions_map_, inter_regions_map_);
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.staticCopy(other.start_visibility_map_, start_visibility_map_);
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.staticCopy(other.goal_visibility_map_, goal_visibility_map_);
    }
 
    /**
@@ -92,12 +101,6 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
    }
 
 
-   public controller_msgs.msg.dds.PlanarRegionsListMessage getPlanarRegionsList()
-   {
-      return planar_regions_list_;
-   }
-
-
    public us.ihmc.idl.IDLSequence.Object<us.ihmc.euclid.geometry.Pose3D>  getBodyPath()
    {
       return body_path_;
@@ -113,6 +116,30 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
    public us.ihmc.euclid.geometry.Pose2D getPathPlannerGoalPose()
    {
       return path_planner_goal_pose_;
+   }
+
+
+   public us.ihmc.idl.IDLSequence.Object<controller_msgs.msg.dds.VisibilityMapWithNavigableRegionMessage>  getNavigableRegions()
+   {
+      return navigable_regions_;
+   }
+
+
+   public controller_msgs.msg.dds.VisibilityMapMessage getInterRegionsMap()
+   {
+      return inter_regions_map_;
+   }
+
+
+   public controller_msgs.msg.dds.VisibilityMapMessage getStartVisibilityMap()
+   {
+      return start_visibility_map_;
+   }
+
+
+   public controller_msgs.msg.dds.VisibilityMapMessage getGoalVisibilityMap()
+   {
+      return goal_visibility_map_;
    }
 
 
@@ -139,7 +166,6 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
 
       if (!us.ihmc.idl.IDLTools.epsilonEqualsPrimitive(this.plan_id_, other.plan_id_, epsilon)) return false;
 
-      if (!this.planar_regions_list_.epsilonEquals(other.planar_regions_list_, epsilon)) return false;
       if (this.body_path_.size() != other.body_path_.size()) { return false; }
       else
       {
@@ -149,6 +175,16 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
 
       if (!this.path_planner_start_pose_.epsilonEquals(other.path_planner_start_pose_, epsilon)) return false;
       if (!this.path_planner_goal_pose_.epsilonEquals(other.path_planner_goal_pose_, epsilon)) return false;
+      if (this.navigable_regions_.size() != other.navigable_regions_.size()) { return false; }
+      else
+      {
+         for (int i = 0; i < this.navigable_regions_.size(); i++)
+         {  if (!this.navigable_regions_.get(i).epsilonEquals(other.navigable_regions_.get(i), epsilon)) return false; }
+      }
+
+      if (!this.inter_regions_map_.epsilonEquals(other.inter_regions_map_, epsilon)) return false;
+      if (!this.start_visibility_map_.epsilonEquals(other.start_visibility_map_, epsilon)) return false;
+      if (!this.goal_visibility_map_.epsilonEquals(other.goal_visibility_map_, epsilon)) return false;
 
       return true;
    }
@@ -168,10 +204,13 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
 
       if(this.plan_id_ != otherMyClass.plan_id_) return false;
 
-      if (!this.planar_regions_list_.equals(otherMyClass.planar_regions_list_)) return false;
       if (!this.body_path_.equals(otherMyClass.body_path_)) return false;
       if (!this.path_planner_start_pose_.equals(otherMyClass.path_planner_start_pose_)) return false;
       if (!this.path_planner_goal_pose_.equals(otherMyClass.path_planner_goal_pose_)) return false;
+      if (!this.navigable_regions_.equals(otherMyClass.navigable_regions_)) return false;
+      if (!this.inter_regions_map_.equals(otherMyClass.inter_regions_map_)) return false;
+      if (!this.start_visibility_map_.equals(otherMyClass.start_visibility_map_)) return false;
+      if (!this.goal_visibility_map_.equals(otherMyClass.goal_visibility_map_)) return false;
 
       return true;
    }
@@ -188,14 +227,20 @@ public class BodyPathPlanMessage extends Packet<BodyPathPlanMessage> implements 
       builder.append(this.footstep_planning_result_);      builder.append(", ");
       builder.append("plan_id=");
       builder.append(this.plan_id_);      builder.append(", ");
-      builder.append("planar_regions_list=");
-      builder.append(this.planar_regions_list_);      builder.append(", ");
       builder.append("body_path=");
       builder.append(this.body_path_);      builder.append(", ");
       builder.append("path_planner_start_pose=");
       builder.append(this.path_planner_start_pose_);      builder.append(", ");
       builder.append("path_planner_goal_pose=");
-      builder.append(this.path_planner_goal_pose_);
+      builder.append(this.path_planner_goal_pose_);      builder.append(", ");
+      builder.append("navigable_regions=");
+      builder.append(this.navigable_regions_);      builder.append(", ");
+      builder.append("inter_regions_map=");
+      builder.append(this.inter_regions_map_);      builder.append(", ");
+      builder.append("start_visibility_map=");
+      builder.append(this.start_visibility_map_);      builder.append(", ");
+      builder.append("goal_visibility_map=");
+      builder.append(this.goal_visibility_map_);
       builder.append("}");
       return builder.toString();
    }

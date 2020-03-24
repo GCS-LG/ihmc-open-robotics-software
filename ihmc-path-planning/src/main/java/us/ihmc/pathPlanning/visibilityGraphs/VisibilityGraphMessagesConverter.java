@@ -17,24 +17,15 @@ import java.util.List;
 
 public class VisibilityGraphMessagesConverter
 {
-   public static BodyPathPlanStatisticsMessage convertToBodyPathPlanStatisticsMessage(VisibilityGraphHolder statistics)
+   public static void packVisibilityGraph(BodyPathPlanMessage bodyPathPlanMessage, int planId, VisibilityGraphHolder graph)
    {
-      return convertToBodyPathPlanStatisticsMessage(BodyPathPlanStatisticsMessage.NO_PLAN_ID, statistics);
-   }
+      bodyPathPlanMessage.setPlanId(planId);
+      bodyPathPlanMessage.getGoalVisibilityMap().set(convertToVisibilityMapMessage(graph.getGoalMapId(), graph.getGoalVisibilityMap()));
+      bodyPathPlanMessage.getStartVisibilityMap().set(convertToVisibilityMapMessage(graph.getStartMapId(), graph.getStartVisibilityMap()));
+      bodyPathPlanMessage.getInterRegionsMap().set(convertToVisibilityMapMessage(graph.getInterRegionsMapId(), graph.getInterRegionsVisibilityMap()));
 
-   public static BodyPathPlanStatisticsMessage convertToBodyPathPlanStatisticsMessage(int planId, VisibilityGraphHolder statistics)
-   {
-      BodyPathPlanStatisticsMessage message = new BodyPathPlanStatisticsMessage();
-
-      message.setPlanId(planId);
-      message.getGoalVisibilityMap().set(convertToVisibilityMapMessage(statistics.getGoalMapId(), statistics.getGoalVisibilityMap()));
-      message.getStartVisibilityMap().set(convertToVisibilityMapMessage(statistics.getStartMapId(), statistics.getStartVisibilityMap()));
-      message.getInterRegionsMap().set(convertToVisibilityMapMessage(statistics.getInterRegionsMapId(), statistics.getInterRegionsVisibilityMap()));
-
-      for (int i = 0; i < statistics.getNumberOfNavigableRegions(); i++)
-         message.getNavigableRegions().add().set(convertToNavigableRegionMessage(statistics.getNavigableRegion(i)));
-
-      return message;
+      for (int i = 0; i < graph.getNumberOfNavigableRegions(); i++)
+         bodyPathPlanMessage.getNavigableRegions().add().set(convertToNavigableRegionMessage(graph.getNavigableRegion(i)));
    }
 
    public static VisibilityMapMessage convertToVisibilityMapMessage(VisibilityMapHolder visibilityMapHolder)
@@ -261,21 +252,19 @@ public class VisibilityGraphMessagesConverter
       return cluster;
    }
 
-   public static VisibilityGraphHolder convertToVisibilityGraphStatistics(BodyPathPlanStatisticsMessage message)
+   public static void extractVisibilityGraph(BodyPathPlanMessage bodyPathPlanMessage, VisibilityGraphHolder visibilityGraphHolderToPack)
    {
-      VisibilityGraphHolder statistics = new VisibilityGraphHolder();
+      VisibilityMapHolder startMap = convertToSingleSourceVisibilityMap(bodyPathPlanMessage.getStartVisibilityMap());
+      VisibilityMapHolder goalMap = convertToSingleSourceVisibilityMap(bodyPathPlanMessage.getGoalVisibilityMap());
+      VisibilityMapHolder interRegionsMap = convertToInterRegionsVisibilityMap(bodyPathPlanMessage.getInterRegionsMap());
 
-      VisibilityMapHolder startMap = convertToSingleSourceVisibilityMap(message.getStartVisibilityMap());
-      VisibilityMapHolder goalMap = convertToSingleSourceVisibilityMap(message.getGoalVisibilityMap());
-      VisibilityMapHolder interRegionsMap = convertToInterRegionsVisibilityMap(message.getInterRegionsMap());
-
-      statistics.setStartVisibilityMapInWorld(startMap.getMapId(), startMap.getVisibilityMapInWorld());
-      statistics.setGoalVisibilityMapInWorld(goalMap.getMapId(), goalMap.getVisibilityMapInWorld());
-      statistics.setInterRegionsVisibilityMapInWorld(interRegionsMap.getMapId(), interRegionsMap.getVisibilityMapInWorld());
-      List<VisibilityMapWithNavigableRegionMessage> navigableRegions = message.getNavigableRegions();
+      visibilityGraphHolderToPack.setStartVisibilityMapInWorld(startMap.getMapId(), startMap.getVisibilityMapInWorld());
+      visibilityGraphHolderToPack.setGoalVisibilityMapInWorld(goalMap.getMapId(), goalMap.getVisibilityMapInWorld());
+      visibilityGraphHolderToPack.setInterRegionsVisibilityMapInWorld(interRegionsMap.getMapId(), interRegionsMap.getVisibilityMapInWorld());
+      List<VisibilityMapWithNavigableRegionMessage> navigableRegions = bodyPathPlanMessage.getNavigableRegions();
       for (int i = 0; i < navigableRegions.size(); i++)
-         statistics.addNavigableRegion(convertToVisibilityMapWithNavigableRegion(navigableRegions.get(i)));
-
-      return statistics;
+      {
+         visibilityGraphHolderToPack.addNavigableRegion(convertToVisibilityMapWithNavigableRegion(navigableRegions.get(i)));
+      }
    }
 }

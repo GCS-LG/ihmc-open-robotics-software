@@ -2,7 +2,6 @@ package us.ihmc.footstepPlanning;
 
 import controller_msgs.msg.dds.BodyPathPlanMessage;
 import us.ihmc.commons.MathTools;
-import us.ihmc.communication.packets.PlanarRegionMessageConverter;
 import us.ihmc.euclid.geometry.ConvexPolygon2D;
 import us.ihmc.euclid.geometry.interfaces.Pose3DReadOnly;
 import us.ihmc.euclid.referenceFrame.FramePose3D;
@@ -21,6 +20,7 @@ import us.ihmc.pathPlanning.bodyPathPlanner.WaypointDefinedBodyPathPlanHolder;
 import us.ihmc.pathPlanning.graph.search.AStarIterationData;
 import us.ihmc.pathPlanning.graph.search.AStarPathPlanner;
 import us.ihmc.pathPlanning.graph.structure.GraphEdge;
+import us.ihmc.pathPlanning.visibilityGraphs.VisibilityGraphMessagesConverter;
 import us.ihmc.pathPlanning.visibilityGraphs.parameters.DefaultVisibilityGraphParameters;
 import us.ihmc.pathPlanning.visibilityGraphs.parameters.VisibilityGraphsParametersBasics;
 import us.ihmc.pathPlanning.visibilityGraphs.postProcessing.BodyPathPostProcessor;
@@ -115,6 +115,7 @@ public class FootstepPlanningModule implements CloseableAndDisposable
       output.setPlanId(request.getRequestId());
       isPlanning.set(true);
       bodyPathPlanHolder.getPlan().clear();
+      bodyPathPlanner.getVisibilityGraphHolder().clear();
 
       startMidFootPose.interpolate(request.getStartFootPoses().get(RobotSide.LEFT), request.getStartFootPoses().get(RobotSide.RIGHT), 0.5);
       goalMidFootPose.interpolate(request.getGoalFootPoses().get(RobotSide.LEFT), request.getGoalFootPoses().get(RobotSide.RIGHT), 0.5);
@@ -213,7 +214,8 @@ public class FootstepPlanningModule implements CloseableAndDisposable
       bodyPathPlanMessage.getPathPlannerGoalPose().set(bodyPathPlan.getGoalPose());
       bodyPathPlanMessage.setPlanId(request.getRequestId());
       bodyPathPlanMessage.setFootstepPlanningResult(result.toByte());
-      bodyPathPlanMessage.getPlanarRegionsList().set(PlanarRegionMessageConverter.convertToPlanarRegionsListMessage(request.getPlanarRegionsList()));
+      VisibilityGraphMessagesConverter.packVisibilityGraph(bodyPathPlanMessage, request.getRequestId(), bodyPathPlanner.getVisibilityGraphHolder());
+
       bodyPathResultCallback.accept(bodyPathPlanMessage);
    }
 

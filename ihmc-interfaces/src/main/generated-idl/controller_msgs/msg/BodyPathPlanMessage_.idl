@@ -1,7 +1,8 @@
 #ifndef __controller_msgs__msg__BodyPathPlanMessage__idl__
 #define __controller_msgs__msg__BodyPathPlanMessage__idl__
 
-#include "controller_msgs/msg/./PlanarRegionsListMessage_.idl"
+#include "controller_msgs/msg/./VisibilityMapMessage_.idl"
+#include "controller_msgs/msg/./VisibilityMapWithNavigableRegionMessage_.idl"
 #include "geometry_msgs/msg/./Pose2D_.idl"
 #include "geometry_msgs/msg/./Pose_.idl"
 module controller_msgs
@@ -46,10 +47,13 @@ module controller_msgs
         octet footstep_planning_result;
         @defaultValue(value=-1)
         long plan_id;
-        controller_msgs::msg::dds::PlanarRegionsListMessage planar_regions_list;
         sequence<geometry_msgs::msg::dds::Pose> body_path;
         geometry_msgs::msg::dds::Pose2D path_planner_start_pose;
         geometry_msgs::msg::dds::Pose2D path_planner_goal_pose;
+        sequence<controller_msgs::msg::dds::VisibilityMapWithNavigableRegionMessage, 25> navigable_regions;
+        controller_msgs::msg::dds::VisibilityMapMessage inter_regions_map;
+        controller_msgs::msg::dds::VisibilityMapMessage start_visibility_map;
+        controller_msgs::msg::dds::VisibilityMapMessage goal_visibility_map;
       };
     };
   };

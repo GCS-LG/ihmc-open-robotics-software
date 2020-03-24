@@ -206,9 +206,12 @@ public class VisibilityGraphMessagesConverterTest
          statisticsToConvert.setInterRegionsVisibilityMapInWorld(interRegionsMap.getMapId(), interRegionsMap.getVisibilityMapInWorld());
          statisticsToConvert.setVisibilityMapsWithNavigableRegions(navigableRegions);
 
-         BodyPathPlanStatisticsMessage message = VisibilityGraphMessagesConverter.convertToBodyPathPlanStatisticsMessage(planId, statisticsToConvert);
-         VisibilityGraphHolder convertedStatistics = VisibilityGraphMessagesConverter.convertToVisibilityGraphStatistics(message);
-         VisibilityGraphTestTools.assertVisibilityGraphStatisticsEqual(statisticsToConvert, convertedStatistics, epsilon);
+         BodyPathPlanMessage bodyPathPlanMessage = new BodyPathPlanMessage();
+         VisibilityGraphHolder visibilityGraphHolderToPack = new VisibilityGraphHolder();
+
+         VisibilityGraphMessagesConverter.packVisibilityGraph(bodyPathPlanMessage, planId, statisticsToConvert);
+         VisibilityGraphMessagesConverter.extractVisibilityGraph(bodyPathPlanMessage, visibilityGraphHolderToPack);
+         VisibilityGraphTestTools.assertVisibilityGraphStatisticsEqual(statisticsToConvert, visibilityGraphHolderToPack, epsilon);
       }
    }
 }

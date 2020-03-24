@@ -23,12 +23,18 @@ int8 footstep_planning_result
 # Field default value -1
 int32 plan_id
 
-controller_msgs/PlanarRegionsListMessage planar_regions_list
-
 geometry_msgs/Pose[] body_path
 
 geometry_msgs/Pose2D path_planner_start_pose
 
 geometry_msgs/Pose2D path_planner_goal_pose
+
+controller_msgs/VisibilityMapWithNavigableRegionMessage[] navigable_regions
+
+controller_msgs/VisibilityMapMessage inter_regions_map
+
+controller_msgs/VisibilityMapMessage start_visibility_map
+
+controller_msgs/VisibilityMapMessage goal_visibility_map
 
 

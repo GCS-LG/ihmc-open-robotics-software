@@ -46,14 +46,21 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
 
       current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4);
 
-      current_alignment += controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType.getMaxCdrSerializedSize(current_alignment);
-
       current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4);for(int i0 = 0; i0 < 100; ++i0)
       {
           current_alignment += geometry_msgs.msg.dds.PosePubSubType.getMaxCdrSerializedSize(current_alignment);}
       current_alignment += geometry_msgs.msg.dds.Pose2DPubSubType.getMaxCdrSerializedSize(current_alignment);
 
       current_alignment += geometry_msgs.msg.dds.Pose2DPubSubType.getMaxCdrSerializedSize(current_alignment);
+
+      current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4);for(int i0 = 0; i0 < 25; ++i0)
+      {
+          current_alignment += controller_msgs.msg.dds.VisibilityMapWithNavigableRegionMessagePubSubType.getMaxCdrSerializedSize(current_alignment);}
+      current_alignment += controller_msgs.msg.dds.VisibilityMapMessagePubSubType.getMaxCdrSerializedSize(current_alignment);
+
+      current_alignment += controller_msgs.msg.dds.VisibilityMapMessagePubSubType.getMaxCdrSerializedSize(current_alignment);
+
+      current_alignment += controller_msgs.msg.dds.VisibilityMapMessagePubSubType.getMaxCdrSerializedSize(current_alignment);
 
 
       return current_alignment - initial_alignment;
@@ -77,8 +84,6 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
       current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4);
 
 
-      current_alignment += controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType.getCdrSerializedSize(data.getPlanarRegionsList(), current_alignment);
-
       current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4);
       for(int i0 = 0; i0 < data.getBodyPath().size(); ++i0)
       {
@@ -87,6 +92,17 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
       current_alignment += geometry_msgs.msg.dds.Pose2DPubSubType.getCdrSerializedSize(data.getPathPlannerStartPose(), current_alignment);
 
       current_alignment += geometry_msgs.msg.dds.Pose2DPubSubType.getCdrSerializedSize(data.getPathPlannerGoalPose(), current_alignment);
+
+      current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4);
+      for(int i0 = 0; i0 < data.getNavigableRegions().size(); ++i0)
+      {
+          current_alignment += controller_msgs.msg.dds.VisibilityMapWithNavigableRegionMessagePubSubType.getCdrSerializedSize(data.getNavigableRegions().get(i0), current_alignment);}
+
+      current_alignment += controller_msgs.msg.dds.VisibilityMapMessagePubSubType.getCdrSerializedSize(data.getInterRegionsMap(), current_alignment);
+
+      current_alignment += controller_msgs.msg.dds.VisibilityMapMessagePubSubType.getCdrSerializedSize(data.getStartVisibilityMap(), current_alignment);
+
+      current_alignment += controller_msgs.msg.dds.VisibilityMapMessagePubSubType.getCdrSerializedSize(data.getGoalVisibilityMap(), current_alignment);
 
 
       return current_alignment - initial_alignment;
@@ -100,13 +116,19 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
 
       cdr.write_type_2(data.getPlanId());
 
-      controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType.write(data.getPlanarRegionsList(), cdr);
       if(data.getBodyPath().size() <= 100)
       cdr.write_type_e(data.getBodyPath());else
           throw new RuntimeException("body_path field exceeds the maximum length");
 
       geometry_msgs.msg.dds.Pose2DPubSubType.write(data.getPathPlannerStartPose(), cdr);
       geometry_msgs.msg.dds.Pose2DPubSubType.write(data.getPathPlannerGoalPose(), cdr);
+      if(data.getNavigableRegions().size() <= 25)
+      cdr.write_type_e(data.getNavigableRegions());else
+          throw new RuntimeException("navigable_regions field exceeds the maximum length");
+
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.write(data.getInterRegionsMap(), cdr);
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.write(data.getStartVisibilityMap(), cdr);
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.write(data.getGoalVisibilityMap(), cdr);
    }
 
    public static void read(controller_msgs.msg.dds.BodyPathPlanMessage data, us.ihmc.idl.CDR cdr)
@@ -117,10 +139,13 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
       	
       data.setPlanId(cdr.read_type_2());
       	
-      controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType.read(data.getPlanarRegionsList(), cdr);	
       cdr.read_type_e(data.getBodyPath());	
       geometry_msgs.msg.dds.Pose2DPubSubType.read(data.getPathPlannerStartPose(), cdr);	
       geometry_msgs.msg.dds.Pose2DPubSubType.read(data.getPathPlannerGoalPose(), cdr);	
+      cdr.read_type_e(data.getNavigableRegions());	
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.read(data.getInterRegionsMap(), cdr);	
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.read(data.getStartVisibilityMap(), cdr);	
+      controller_msgs.msg.dds.VisibilityMapMessagePubSubType.read(data.getGoalVisibilityMap(), cdr);	
 
    }
 
@@ -130,12 +155,17 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
       ser.write_type_4("sequence_id", data.getSequenceId());
       ser.write_type_9("footstep_planning_result", data.getFootstepPlanningResult());
       ser.write_type_2("plan_id", data.getPlanId());
-      ser.write_type_a("planar_regions_list", new controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType(), data.getPlanarRegionsList());
-
       ser.write_type_e("body_path", data.getBodyPath());
       ser.write_type_a("path_planner_start_pose", new geometry_msgs.msg.dds.Pose2DPubSubType(), data.getPathPlannerStartPose());
 
       ser.write_type_a("path_planner_goal_pose", new geometry_msgs.msg.dds.Pose2DPubSubType(), data.getPathPlannerGoalPose());
+
+      ser.write_type_e("navigable_regions", data.getNavigableRegions());
+      ser.write_type_a("inter_regions_map", new controller_msgs.msg.dds.VisibilityMapMessagePubSubType(), data.getInterRegionsMap());
+
+      ser.write_type_a("start_visibility_map", new controller_msgs.msg.dds.VisibilityMapMessagePubSubType(), data.getStartVisibilityMap());
+
+      ser.write_type_a("goal_visibility_map", new controller_msgs.msg.dds.VisibilityMapMessagePubSubType(), data.getGoalVisibilityMap());
 
    }
 
@@ -145,12 +175,17 @@ public class BodyPathPlanMessagePubSubType implements us.ihmc.pubsub.TopicDataTy
       data.setSequenceId(ser.read_type_4("sequence_id"));
       data.setFootstepPlanningResult(ser.read_type_9("footstep_planning_result"));
       data.setPlanId(ser.read_type_2("plan_id"));
-      ser.read_type_a("planar_regions_list", new controller_msgs.msg.dds.PlanarRegionsListMessagePubSubType(), data.getPlanarRegionsList());
-
       ser.read_type_e("body_path", data.getBodyPath());
       ser.read_type_a("path_planner_start_pose", new geometry_msgs.msg.dds.Pose2DPubSubType(), data.getPathPlannerStartPose());
 
       ser.read_type_a("path_planner_goal_pose", new geometry_msgs.msg.dds.Pose2DPubSubType(), data.getPathPlannerGoalPose());
+
+      ser.read_type_e("navigable_regions", data.getNavigableRegions());
+      ser.read_type_a("inter_regions_map", new controller_msgs.msg.dds.VisibilityMapMessagePubSubType(), data.getInterRegionsMap());
+
+      ser.read_type_a("start_visibility_map", new controller_msgs.msg.dds.VisibilityMapMessagePubSubType(), data.getStartVisibilityMap());
+
+      ser.read_type_a("goal_visibility_map", new controller_msgs.msg.dds.VisibilityMapMessagePubSubType(), data.getGoalVisibilityMap());
 
    }
 

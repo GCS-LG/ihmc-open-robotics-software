@@ -174,9 +174,6 @@ public class RemoteUIMessageConverter
       // we want to listen to the resulting body path plan from the toolbox
       ROS2Tools.createCallbackSubscription(ros2Node, BodyPathPlanMessage.class, FootstepPlannerCommunicationProperties.publisherTopicNameGenerator(robotName),
                                            s -> processBodyPathPlanMessage(s.takeNextData()));
-      ROS2Tools.createCallbackSubscription(ros2Node, BodyPathPlanStatisticsMessage.class,
-                                           FootstepPlannerCommunicationProperties.publisherTopicNameGenerator(robotName),
-                                           s -> processBodyPathPlanStatistics(s.takeNextData()));
       ROS2Tools.createCallbackSubscription(ros2Node, FootstepPlannerStatusMessage.class,
                                            FootstepPlannerCommunicationProperties.publisherTopicNameGenerator(robotName),
                                            s -> processFootstepPlannerStatus(s.takeNextData()));
@@ -298,21 +295,12 @@ public class RemoteUIMessageConverter
 
    private void processBodyPathPlanMessage(BodyPathPlanMessage packet)
    {
-      PlanarRegionsListMessage planarRegionsListMessage = packet.getPlanarRegionsList();
-      PlanarRegionsList planarRegionsList = PlanarRegionMessageConverter.convertToPlanarRegionsList(planarRegionsListMessage);
       FootstepPlanningResult result = FootstepPlanningResult.fromByte(packet.getFootstepPlanningResult());
       List<? extends Pose3DReadOnly> bodyPath = packet.getBodyPath();
 
-      messager.submitMessage(FootstepPlannerMessagerAPI.PlanarRegionData, planarRegionsList);
       messager.submitMessage(FootstepPlannerMessagerAPI.PlanningResult, result);
       messager.submitMessage(FootstepPlannerMessagerAPI.BodyPathData, bodyPath);
 
-      if (verbose)
-         LogTools.info("Received a body path planning result from the toolbox.");
-   }
-
-   private void processBodyPathPlanStatistics(BodyPathPlanStatisticsMessage packet)
-   {
       VisibilityMapHolder startVisibilityMap = VisibilityGraphMessagesConverter.convertToSingleSourceVisibilityMap(packet.getStartVisibilityMap());
       VisibilityMapHolder goalVisibilityMap = VisibilityGraphMessagesConverter.convertToSingleSourceVisibilityMap(packet.getGoalVisibilityMap());
       VisibilityMapHolder interRegionVisibilityMap = VisibilityGraphMessagesConverter.convertToInterRegionsVisibilityMap(packet.getInterRegionsMap());
@@ -323,6 +311,9 @@ public class RemoteUIMessageConverter
       messager.submitMessage(FootstepPlannerMessagerAPI.GoalVisibilityMap, goalVisibilityMap);
       messager.submitMessage(FootstepPlannerMessagerAPI.VisibilityMapWithNavigableRegionData, navigableRegionList);
       messager.submitMessage(FootstepPlannerMessagerAPI.InterRegionVisibilityMap, interRegionVisibilityMap);
+
+      if (verbose)
+         LogTools.info("Received a body path planning result from the toolbox.");
    }
 
    private void processFootstepPlannerStatus(FootstepPlannerStatusMessage packet)
