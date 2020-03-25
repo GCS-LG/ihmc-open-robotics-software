@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.Pair;
 import us.ihmc.communication.packets.PlanarRegionMessageConverter;
 import us.ihmc.euclid.geometry.ConvexPolygon2D;
@@ -32,6 +33,8 @@ import us.ihmc.footstepPlanning.tools.PlannerTools;
 import us.ihmc.javaFXToolkit.messager.JavaFXMessager;
 import us.ihmc.pathPlanning.graph.structure.GraphEdge;
 import us.ihmc.pathPlanning.visibilityGraphs.VisibilityGraphMessagesConverter;
+import us.ihmc.pathPlanning.visibilityGraphs.dataStructure.VisibilityGraphHolder;
+import us.ihmc.pathPlanning.visibilityGraphs.dataStructure.VisibilityMap;
 import us.ihmc.pathPlanning.visibilityGraphs.dataStructure.VisibilityMapWithNavigableRegion;
 import us.ihmc.pathPlanning.visibilityGraphs.interfaces.VisibilityMapHolder;
 import us.ihmc.pathPlanning.visibilityGraphs.parameters.DefaultVisibilityGraphParameters;
@@ -215,17 +218,12 @@ public class FootstepPlannerLogVisualizerController
       messager.submitMessage(FootstepPlannerMessagerAPI.LowLevelGoalOrientation, footstepPlannerLog.getStatusPacket().getLowLevelPlannerGoal().getOrientation());
       messager.submitMessage(FootstepPlannerMessagerAPI.FootstepPlanResponse, footstepPlannerLog.getStatusPacket().getFootstepDataList());
 
-      // publish body path plan output
-      BodyPathPlanMessage bodyPathPlanMessage = footstepPlannerLog.getBodyPathPlanMessage();
-      VisibilityMapHolder startVisibilityMap = VisibilityGraphMessagesConverter.convertToSingleSourceVisibilityMap(bodyPathPlanMessage.getStartVisibilityMap());
-      VisibilityMapHolder goalVisibilityMap = VisibilityGraphMessagesConverter.convertToSingleSourceVisibilityMap(bodyPathPlanMessage.getGoalVisibilityMap());
-      VisibilityMapHolder interRegionVisibilityMap = VisibilityGraphMessagesConverter.convertToInterRegionsVisibilityMap(bodyPathPlanMessage.getInterRegionsMap());
-      List<VisibilityMapWithNavigableRegion> navigableRegionList = VisibilityGraphMessagesConverter.convertToNavigableRegionsList(bodyPathPlanMessage.getNavigableRegions());
-
-      messager.submitMessage(FootstepPlannerMessagerAPI.StartVisibilityMap, startVisibilityMap);
-      messager.submitMessage(FootstepPlannerMessagerAPI.GoalVisibilityMap, goalVisibilityMap);
-      messager.submitMessage(FootstepPlannerMessagerAPI.VisibilityMapWithNavigableRegionData, navigableRegionList);
-      messager.submitMessage(FootstepPlannerMessagerAPI.InterRegionVisibilityMap, interRegionVisibilityMap);
+      // publish visibility graph data
+      VisibilityGraphHolder visibilityGraphHolder = footstepPlannerLog.getVisibilityGraphHolder();
+      messager.submitMessage(FootstepPlannerMessagerAPI.StartVisibilityMap, new VisibilityMapWrapper(visibilityGraphHolder.getStartMapId(), visibilityGraphHolder.getStartVisibilityMap()));
+      messager.submitMessage(FootstepPlannerMessagerAPI.GoalVisibilityMap, new VisibilityMapWrapper(visibilityGraphHolder.getGoalMapId(), visibilityGraphHolder.getGoalVisibilityMap()));
+      messager.submitMessage(FootstepPlannerMessagerAPI.InterRegionVisibilityMap, new VisibilityMapWrapper(visibilityGraphHolder.getInterRegionsMapId(), visibilityGraphHolder.getInterRegionsVisibilityMap()));
+      messager.submitMessage(FootstepPlannerMessagerAPI.VisibilityMapWithNavigableRegionData, visibilityGraphHolder.getVisibilityMapsWithNavigableRegions());
       messager.submitMessage(FootstepPlannerMessagerAPI.BodyPathData, footstepPlannerLog.getStatusPacket().getBodyPath());
 
       // set graphics
@@ -243,6 +241,36 @@ public class FootstepPlannerLogVisualizerController
 
       // set graph data
       updateGraphData(planarRegionsList, footstepPlannerLog.getEdgeDataMap(), footstepPlannerLog.getIterationData());
+   }
+
+   private class VisibilityMapWrapper implements VisibilityMapHolder
+   {
+      private final int id;
+      private final VisibilityMap visibilityMap;
+
+      VisibilityMapWrapper(int id, VisibilityMap visibilityMap)
+      {
+         this.id = id;
+         this.visibilityMap = visibilityMap;
+      }
+
+      @Override
+      public int getMapId()
+      {
+         return id;
+      }
+
+      @Override
+      public VisibilityMap getVisibilityMapInLocal()
+      {
+         throw new NotImplementedException("Local visibility map not implemented by log loader");
+      }
+
+      @Override
+      public VisibilityMap getVisibilityMapInWorld()
+      {
+         return visibilityMap;
+      }
    }
 
    private void updateGraphData(PlanarRegionsList planarRegionsList,

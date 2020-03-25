@@ -3,6 +3,8 @@ package us.ihmc.footstepPlanning.log;
 import controller_msgs.msg.dds.*;
 import us.ihmc.footstepPlanning.graphSearch.graph.FootstepNode;
 import us.ihmc.pathPlanning.graph.structure.GraphEdge;
+import us.ihmc.pathPlanning.visibilityGraphs.dataStructure.VisibilityGraphHolder;
+import us.ihmc.pathPlanning.visibilityGraphs.tools.BodyPathPlan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ public class FootstepPlannerLog
    private final BodyPathPlanMessage bodyPathPlanMessage = new BodyPathPlanMessage();
    private final FootstepPlanningToolboxOutputStatus statusPacket = new FootstepPlanningToolboxOutputStatus();
 
+   private final VisibilityGraphHolder visibilityGraphHolder = new VisibilityGraphHolder();
    private final Map<GraphEdge<FootstepNode>, FootstepPlannerEdgeData> edgeDataMap = new HashMap<>();
    private final List<FootstepPlannerIterationData> iterationData = new ArrayList<>();
 
@@ -55,6 +58,11 @@ public class FootstepPlannerLog
    public BodyPathPlanMessage getBodyPathPlanMessage()
    {
       return bodyPathPlanMessage;
+   }
+
+   public VisibilityGraphHolder getVisibilityGraphHolder()
+   {
+      return visibilityGraphHolder;
    }
 
    public Map<GraphEdge<FootstepNode>, FootstepPlannerEdgeData> getEdgeDataMap()

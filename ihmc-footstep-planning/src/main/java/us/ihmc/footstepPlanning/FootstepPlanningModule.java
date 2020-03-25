@@ -218,7 +218,7 @@ public class FootstepPlanningModule implements CloseableAndDisposable
       bodyPathPlanMessage.getPathPlannerGoalPose().set(bodyPathPlan.getGoalPose());
       bodyPathPlanMessage.setPlanId(request.getRequestId());
       bodyPathPlanMessage.setFootstepPlanningResult(result.toByte());
-      VisibilityGraphMessagesConverter.packVisibilityGraph(bodyPathPlanMessage, request.getRequestId(), bodyPathPlanner.getVisibilityGraphHolder());
+//      VisibilityGraphMessagesConverter.packVisibilityGraph(bodyPathPlanMessage, request.getRequestId(), bodyPathPlanner.getVisibilityGraphHolder());
 
       bodyPathResultCallback.accept(bodyPathPlanMessage);
    }
@@ -306,9 +306,9 @@ public class FootstepPlanningModule implements CloseableAndDisposable
       return bodyPathPlanner;
    }
 
-   public BodyPathPlanMessage getBodyPathPlanMessage()
+   public BodyPathPlan getBodyPathPlan()
    {
-      return bodyPathPlanMessage;
+      return bodyPathPlanHolder.getBodyPathPlan();
    }
 
    public FootstepNode getEndNode()
